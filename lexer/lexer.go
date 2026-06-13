@@ -20,6 +20,20 @@ func (lexer *Lexer) getCharacter() {
   lexer.currentPosition += 1
 }
 
+func isLetter(ch byte) bool {
+  return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z'
+}
+
+func (lexer *Lexer) readIdentifier() string {
+  start := lexer.position
+
+  for isLetter(lexer.ch) {
+    lexer.getCharacter()
+  }
+
+  return lexer.input[ start : lexer.position ]
+}
+
 func New(input string) *Lexer {
   lexer := &Lexer{ input: input }
 
@@ -56,6 +70,13 @@ func (lexer *Lexer) NextToken() token.Token {
     case 0:
       t.Literal = ""
       t.Type = token.T_END
+    default:
+      if isLetter(lexer.ch) {
+        t.Literal = lexer.readIdentifier()
+        t.Type = token.T_IDENTIFIER
+
+        return t
+      }
   }
 
   lexer.getCharacter()

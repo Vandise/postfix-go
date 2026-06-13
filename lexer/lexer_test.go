@@ -17,9 +17,10 @@ func Test__Tokens(t *testing.T) {
     { token.T_ASSIGN, "=" },
     { token.T_OPEN_PAREN,  "(" },
     { token.T_CLOSE_PAREN, ")" },
+    { token.T_IDENTIFIER, "variable" },
   }
 
-  scanner := New(`+-*/=()`)
+  scanner := New(`+-*/=()variable`)
 
   for _, assertion := range assertions {
     subject := scanner.NextToken()
