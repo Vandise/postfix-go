@@ -15,7 +15,6 @@ func (assignment *AssignmentStatement) Literal() string {
 func (assignment *AssignmentStatement) String() string {
   var out bytes.Buffer
 
-  out.WriteString(assignment.Literal() + " ")
   out.WriteString(assignment.Name.String())
   out.WriteString(" = ")
 

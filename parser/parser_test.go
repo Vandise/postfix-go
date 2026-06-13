@@ -15,13 +15,13 @@ func isValidAssignmentStatement(t *testing.T, statement ast.Statement, name stri
     return false
   }
 
-  if assignmentStatement.Token.Type != token.T_IDENTIFIER {
+  if assignmentStatement.Token.Type != token.T_ASSIGN {
     t.Errorf("Statement Token not %s, got=%s", token.T_IDENTIFIER, assignmentStatement.Token.Type)
     return false
   }
 
-  if assignmentStatement.Name.Token.Type != token.T_ASSIGN {
-    t.Errorf("Statement Name not %s, got=%s", token.T_ASSIGN, assignmentStatement.Name.Token.Type)
+  if assignmentStatement.Name.Token.Type != token.T_IDENTIFIER {
+    t.Errorf("Statement Name not %s, got=%s", token.T_IDENTIFIER, assignmentStatement.Name.Token.Type)
     return false
   }
 
@@ -31,6 +31,28 @@ func isValidAssignmentStatement(t *testing.T, statement ast.Statement, name stri
   }
 
   return true
+}
+
+func Test__String(t *testing.T) {
+  session := &ast.Session{
+    Statements: []ast.Statement{
+      &ast.AssignmentStatement{
+        Token: token.Token{Type: token.T_ASSIGN, Literal: "="},
+        Name: &ast.Identifier{
+          Token: token.Token{Type: token.T_IDENTIFIER, Literal: "x"},
+          Value: "x",
+        },
+        Value: &ast.Identifier{
+          Token: token.Token{Type: token.T_IDENTIFIER, Literal: "y"},
+          Value: "y",
+        },
+      },
+    },
+  }
+
+  if session.String() != "x = y\n" {
+    t.Fatalf("Expected x = y, got:%s", session.String())
+  }
 }
 
 func Test__AssignmentStatement(t *testing.T) {

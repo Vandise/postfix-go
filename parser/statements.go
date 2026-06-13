@@ -15,15 +15,16 @@ func (parser *Parser) parseStatement() ast.Statement {
 }
 
 func (parser *Parser) assignmentStatement() *ast.AssignmentStatement {
-  statement := &ast.AssignmentStatement{ Token: parser.current }
-
+  idType := parser.current
   id := parser.current.Literal
 
   if !parser.expectPeek(token.T_ASSIGN) {
     return nil
   }
 
-  statement.Name = &ast.Identifier{ Token: parser.current, Value: id }
+  statement := &ast.AssignmentStatement{ Token: parser.current }
+
+  statement.Name = &ast.Identifier{ Token: idType, Value: id }
 
   for !parser.currentTokenIs(token.T_NEWLINE) {
     parser.nextToken()
