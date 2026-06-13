@@ -20,7 +20,7 @@ func Test__Tokens(t *testing.T) {
     { token.T_IDENTIFIER, "variable" },
   }
 
-  scanner := New(`+-*/=()variable`)
+  scanner := New(`+ - * / = ( ) variable`)
 
   for _, assertion := range assertions {
     subject := scanner.NextToken()

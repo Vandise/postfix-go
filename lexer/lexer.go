@@ -34,6 +34,12 @@ func (lexer *Lexer) readIdentifier() string {
   return lexer.input[ start : lexer.position ]
 }
 
+func (lexer *Lexer) skipWhiteSpace() {
+  for lexer.ch == ' ' || lexer.ch == '\t' || lexer.ch == '\n' || lexer.ch == '\r' {
+    lexer.getCharacter()
+  }
+}
+
 func New(input string) *Lexer {
   lexer := &Lexer{ input: input }
 
@@ -44,6 +50,8 @@ func New(input string) *Lexer {
 
 func (lexer *Lexer) NextToken() token.Token {
   var t token.Token
+
+  lexer.skipWhiteSpace()
 
   switch lexer.ch {
     case '+':
