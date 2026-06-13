@@ -10,6 +10,7 @@ type Token struct {
 const (
   T_ILLEGAL     = "T_ILLEGAL"
   T_IDENTIFIER  = "T_IDENTIFIER"
+  T_INTEGER     = "T_INTEGER"
   T_ASSIGN      = "T_ASSIGN"
   T_PLUS        = "T_PLUS"
   T_MINUS       = "T_MINUS"

@@ -24,10 +24,24 @@ func isLetter(ch byte) bool {
   return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z'
 }
 
+func isDigit(ch byte) bool {
+  return '0' <= ch || '9' <= ch
+}
+
 func (lexer *Lexer) readIdentifier() string {
   start := lexer.position
 
   for isLetter(lexer.ch) {
+    lexer.getCharacter()
+  }
+
+  return lexer.input[ start : lexer.position ]
+}
+
+func (lexer *Lexer) readNumeric() string {
+  start := lexer.position
+
+  for isDigit(lexer.ch) {
     lexer.getCharacter()
   }
 
@@ -82,6 +96,13 @@ func (lexer *Lexer) NextToken() token.Token {
       if isLetter(lexer.ch) {
         t.Literal = lexer.readIdentifier()
         t.Type = token.T_IDENTIFIER
+
+        return t
+      }
+
+      if isDigit(lexer.ch) {
+        t.Literal = lexer.readNumeric()
+        t.Type = token.T_INTEGER
 
         return t
       }
