@@ -13,6 +13,28 @@ type Parser struct {
   peek    token.Token
 }
 
+func (parser *Parser) nextToken() {
+  parser.current = parser.peek
+  parser.peek = parser.l.NextToken()
+}
+
+func (parser *Parser) currentTokenIs(t token.TokenType) bool {
+  return parser.current.Type == t
+}
+
+func (parser *Parser) peekTokenIs(t token.TokenType) bool {
+  return parser.peek.Type == t
+}
+
+func (parser *Parser) expectPeek(t token.TokenType) bool {
+  if parser.peekTokenIs(t) {
+    parser.nextToken()
+    return true
+  }
+
+  return false
+}
+
 func New(l *lexer.Lexer) *Parser {
   parser := &Parser{ l: l }
 
@@ -23,11 +45,19 @@ func New(l *lexer.Lexer) *Parser {
   return parser
 }
 
-func (parser *Parser) nextToken() {
-  parser.current = parser.peek
-  parser.peek = parser.l.NextToken()
-}
-
 func (parser *Parser) Parse() *ast.Session {
-  return nil
+  session := &ast.Session{}
+  session.Statements = []ast.Statement{}
+
+  for parser.current.Type != token.T_END {
+    statement := parser.parseStatement()
+
+    if statement != nil {
+      session.Statements = append(session.Statements, statement)
+    }
+
+    parser.nextToken()
+  }
+
+  return session
 }
