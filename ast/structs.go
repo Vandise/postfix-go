@@ -16,3 +16,9 @@ type AssignmentStatement struct {
   Name   *Identifier
   Value  Expression
 }
+
+// expressions can also be a statement
+type ExpressionStatement struct {
+  Token token.Token
+  Expression  Expression
+}
