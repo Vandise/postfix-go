@@ -17,4 +17,5 @@ const (
   T_STAR        = "T_STAR"
   T_OPEN_PAREN  = "T_OPEN_PAREN"
   T_CLOSE_PAREN = "T_CLOSE_PAREN"
+  T_END         = "T_END"
 )

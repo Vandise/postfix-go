@@ -22,7 +22,7 @@ func Test__Tokens(t *testing.T) {
   scanner := New(`+-*/=()`)
 
   for _, assertion := range assertions {
-    subject = scanner.NextToken()
+    subject := scanner.NextToken()
 
     if subject.Type != assertion.ExpectedType {
       t.Fatalf("Incorrect token type. expected=%q, got=%q",
