@@ -11,7 +11,7 @@ type Lexer struct {
 
 func (lexer *Lexer) getCharacter() {
   if lexer.currentPosition >= len(lexer.input) {
-    lexer.ch = 0
+    lexer.ch = token.END_TOKEN_VALUE
   } else {
     lexer.ch = lexer.input[lexer.currentPosition]
   }
@@ -54,6 +54,14 @@ func (lexer *Lexer) skipWhiteSpace() {
   }
 }
 
+func (lexer *Lexer) peek(n int) byte {
+  if lexer.currentPosition + n > len(lexer.input) {
+    return token.END_TOKEN_VALUE
+  }
+
+  return lexer.input[ lexer.currentPosition + n ]
+}
+
 func New(input string) *Lexer {
   lexer := &Lexer{ input: input }
 
@@ -89,7 +97,10 @@ func (lexer *Lexer) NextToken() token.Token {
     case '=':
       t.Literal = string(lexer.ch)
       t.Type = token.T_ASSIGN
-    case 0:
+    case '!':
+      t.Literal = string(lexer.ch)
+      t.Type = token.T_BANG
+    case token.END_TOKEN_VALUE:
       t.Literal = ""
       t.Type = token.T_END
     default:

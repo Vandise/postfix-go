@@ -7,6 +7,8 @@ type Token struct {
   Literal string
 }
 
+const END_TOKEN_VALUE = 0
+
 const (
   T_ILLEGAL     = "T_ILLEGAL"
   T_IDENTIFIER  = "T_IDENTIFIER"
@@ -18,5 +20,6 @@ const (
   T_STAR        = "T_STAR"
   T_OPEN_PAREN  = "T_OPEN_PAREN"
   T_CLOSE_PAREN = "T_CLOSE_PAREN"
+  T_BANG        = "T_BANG"
   T_END         = "T_END"
 )

@@ -19,9 +19,10 @@ func Test__Tokens(t *testing.T) {
     { token.T_CLOSE_PAREN, ")" },
     { token.T_IDENTIFIER,  "variable" },
     { token.T_INTEGER,     "10" },
+    { token.T_BANG,        "!" },
   }
 
-  scanner := New(`+ - * / = ( ) variable 10`)
+  scanner := New(`+ - * / = ( ) variable 10 !`)
 
   for _, assertion := range assertions {
     subject := scanner.NextToken()
