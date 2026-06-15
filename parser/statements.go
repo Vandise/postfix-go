@@ -13,7 +13,7 @@ func (parser *Parser) parseStatement() ast.Statement {
       }
       fallthrough
     default:
-      return nil
+      return parser.expressionStatement()
   }
 }
 
@@ -29,9 +29,16 @@ func (parser *Parser) assignmentStatement() *ast.AssignmentStatement {
 
   statement.Name = &ast.Identifier{ Token: idType, Value: id }
 
-  for !parser.currentTokenIs(token.T_NEWLINE) {
-    parser.nextToken()
-  }
+  parser.nextToken()
+
+  return statement
+}
+
+func (parser *Parser) expressionStatement() *ast.ExpressionStatement {
+  statement := &ast.ExpressionStatement{ Token: parser.current }
+  statement.Expression = parser.parseExpression(LOWEST)
+
+  parser.nextToken()
 
   return statement
 }

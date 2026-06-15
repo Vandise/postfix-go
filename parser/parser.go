@@ -14,6 +14,16 @@ type (
   InfixParseFunction  func(ast.Expression) ast.Expression
 )
 
+const (
+  _ int = iota
+  LOWEST
+  EQUALS
+  LTGT
+  SUM
+  PRODUCT
+  PREFIX
+)
+
 type Parser struct {
   l *lexer.Lexer
 
@@ -57,6 +67,9 @@ func (parser *Parser) expectPeek(t token.TokenType) bool {
 func New(l *lexer.Lexer) *Parser {
   parser := &Parser{ l: l }
 
+  parser.prefixParseFunctions = make(map[token.TokenType]PrefixParseFunction)
+  parser.registerPrefixFunction(token.T_IDENTIFIER, parser.parseIdentifier)
+
   // set current and peek
   parser.nextToken()
   parser.nextToken()
@@ -79,4 +92,18 @@ func (parser *Parser) Parse() *ast.Session {
   }
 
   return session
+}
+
+func (parser *Parser) parseIdentifier() ast.Expression {
+  return &ast.Identifier{ Token: parser.current, Value: parser.current.Literal }
+}
+
+func (parser *Parser) parseExpression(precedence int) ast.Expression {
+  prefix := parser.prefixParseFunctions[parser.current.Type]
+
+  if prefix == nil {
+    return nil
+  }
+
+  return prefix()
 }
