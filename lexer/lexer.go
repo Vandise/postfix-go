@@ -49,7 +49,7 @@ func (lexer *Lexer) readNumeric() string {
 }
 
 func (lexer *Lexer) skipWhiteSpace() {
-  for lexer.ch == ' ' || lexer.ch == '\t' || lexer.ch == '\r' {
+  for lexer.ch == ' ' || lexer.ch == '\t' || lexer.ch == '\n' || lexer.ch == '\r' {
     lexer.getCharacter()
   }
 }
@@ -100,9 +100,9 @@ func (lexer *Lexer) NextToken() token.Token {
     case '!':
       t.Literal = string(lexer.ch)
       t.Type = token.T_BANG
-    case '\n':
-      t.Literal = string(lexer.ch)
-      t.Type = token.T_NEWLINE
+    //case '\n':
+    //  t.Literal = string(lexer.ch)
+    //  t.Type = token.T_NEWLINE
     case token.END_TOKEN_VALUE:
       t.Literal = ""
       t.Type = token.T_END
