@@ -1,6 +1,7 @@
 package parser
 
 import (
+  "strconv"
   "postfix/token"
   "postfix/lexer"
   "postfix/ast"
@@ -69,6 +70,7 @@ func New(l *lexer.Lexer) *Parser {
 
   parser.prefixParseFunctions = make(map[token.TokenType]PrefixParseFunction)
   parser.registerPrefixFunction(token.T_IDENTIFIER, parser.parseIdentifier)
+  parser.registerPrefixFunction(token.T_INTEGER, parser.parseInteger)
 
   // set current and peek
   parser.nextToken()
@@ -96,6 +98,20 @@ func (parser *Parser) Parse() *ast.Session {
 
 func (parser *Parser) parseIdentifier() ast.Expression {
   return &ast.Identifier{ Token: parser.current, Value: parser.current.Literal }
+}
+
+func (parser *Parser) parseInteger() ast.Expression {
+  literal := &ast.IntegerLiteral{ Token: parser.current }
+
+  value, err := strconv.ParseInt(parser.current.Literal, 0, 64)
+
+  if err != nil {
+    return nil
+  }
+
+  literal.Value = value
+
+  return literal
 }
 
 func (parser *Parser) parseExpression(precedence int) ast.Expression {
