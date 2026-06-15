@@ -117,3 +117,31 @@ func Test__IdentifierExpression(t *testing.T) {
     t.Fatalf("Identifier Literal not x, got=%s", id.Literal())
   }
 }
+
+func Test__IntegerLiteralExpression(t *testing.T) {
+  l := lexer.New(`10`)
+  parser := New(l)
+
+  session := parser.Parse()
+  if len(session.Statements) != 1 {
+    t.Fatalf("Expected 1 IntegerLiteralExpression, got=%d", len(session.Statements))
+  }
+
+  statement, ok := session.Statements[0].(*ast.ExpressionStatement)
+  if !ok {
+    t.Fatalf("Statement not ExpressionStatement, got=%T", statement)
+  }
+
+  integer, ok := statement.Expression.(*ast.IntegerLiteral)
+  if !ok {
+    t.Fatalf("Expression not IntegerLiteral, got=%T", integer)
+  }
+
+  if integer.Value != 10 {
+    t.Fatalf("integer Literal not 10, got=%d", integer.Value)
+  }
+
+  if integer.Literal() != "10" {
+    t.Fatalf("integer Literal not 10, got=%s", integer.Literal())
+  }
+}

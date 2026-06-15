@@ -11,6 +11,11 @@ type Identifier struct {
   Value string
 }
 
+type IntegerLiteral struct {
+  Token token.Token
+  Value int64
+}
+
 type AssignmentStatement struct {
   Token  token.Token
   Name   *Identifier
