@@ -89,3 +89,31 @@ func Test__AssignmentStatement(t *testing.T) {
     }
   }
 }
+
+func Test__IdentifierExpression(t *testing.T) {
+  l := lexer.New(`x`)
+  parser := New(l)
+
+  session := parser.Parse()
+  if len(session.Statements) != 1 {
+    t.Fatalf("Expected 1 IdentifierExpression, got=%d", len(session.Statements))
+  }
+
+  statement, ok := session.Statements[0].(*ast.ExpressionStatement)
+  if !ok {
+    t.Fatalf("Statement not ExpressionStatement, got=%T", statement)
+  }
+
+  id, ok := statement.Expression.(*ast.Identifier)
+  if !ok {
+    t.Fatalf("Expression not Identifier, got=%T", id)
+  }
+
+  if id.Value != "x" {
+    t.Fatalf("Identifier not x, got=%s", id.Value)
+  }
+
+  if id.Literal() != "x" {
+    t.Fatalf("Identifier Literal not x, got=%s", id.Literal())
+  }
+}

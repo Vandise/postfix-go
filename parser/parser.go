@@ -6,11 +6,30 @@ import (
   "postfix/ast"
 )
 
+//
+// Pratt-style Parser, mapping Tokens to Function Definitions
+//
+type (
+  PrefixParseFunction func() ast.Expression
+  InfixParseFunction  func(ast.Expression) ast.Expression
+)
+
 type Parser struct {
   l *lexer.Lexer
 
   current token.Token
   peek    token.Token
+
+  prefixParseFunctions map[token.TokenType]PrefixParseFunction
+  infixParseFunction   map[token.TokenType]InfixParseFunction
+}
+
+func (parser *Parser) registerPrefixFunction(tokenType token.TokenType, handle PrefixParseFunction) {
+  parser.prefixParseFunctions[tokenType] = handle
+}
+
+func (parser *Parser) registerInfixFunction(tokenType token.TokenType, handle InfixParseFunction) {
+  parser.infixParseFunction[tokenType] = handle
 }
 
 func (parser *Parser) nextToken() {

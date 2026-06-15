@@ -8,7 +8,10 @@ import (
 func (parser *Parser) parseStatement() ast.Statement {
   switch parser.current.Type {
     case token.T_IDENTIFIER:
-      return parser.assignmentStatement()
+      if parser.peekTokenIs(token.T_ASSIGN) {
+        return parser.assignmentStatement()
+      }
+      fallthrough
     default:
       return nil
   }
