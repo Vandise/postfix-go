@@ -33,3 +33,10 @@ type PrefixExpression struct {
   Operator string
   Right Expression
 }
+
+type InfixExpression struct {
+  Token token.Token
+  Left Expression
+  Operator string
+  Right Expression
+}

@@ -15,8 +15,10 @@ func (prefix *PrefixExpression) Literal() string {
 func (prefix *PrefixExpression) String() string {
   var out bytes.Buffer
 
+  out.WriteString("(")
   out.WriteString(prefix.Operator)
   out.WriteString(prefix.Right.String())
+  out.WriteString(")")
 
   return out.String()
 }

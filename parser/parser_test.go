@@ -169,3 +169,66 @@ func Test__NegPrefixExpression(t *testing.T) {
     t.Fatalf("Operator not neg, got=%s", exp.Operator)
   }
 }
+
+func Test__InfixExpressions(t *testing.T) {
+  infixTests := []struct{
+    input string
+    left int64
+    operator string
+    right int64
+  }{
+    {"10 + 10", 10, "+", 10},
+    {"10 - 10", 10, "-", 10},
+    {"10 * 10", 10, "*", 10},
+    {"10 / 10", 10, "/", 10},
+  }
+
+  for _, subject := range infixTests {
+    l := lexer.New(subject.input)
+    parser := New(l)
+  
+    session := parser.Parse()
+    if len(session.Statements) != 1 {
+      t.Fatalf("Expected 1 InfixExpression, got=%d", len(session.Statements))
+    }
+
+    statement, ok := session.Statements[0].(*ast.ExpressionStatement)
+    if !ok {
+      t.Fatalf("Statement not ExpressionStatement, got=%T", statement)
+    }
+
+    exp, ok := statement.Expression.(*ast.InfixExpression)
+    if !ok {
+      t.Fatalf("Expression not InfixExpression, got=%T", exp)
+    }
+
+    // todo: test left and right
+    if exp.Operator != subject.operator {
+      t.Fatalf("Operator not %s, got=%s", subject.operator, exp.Operator)
+    }
+
+    t.Logf("%s", session.String())
+  }
+}
+
+func Test__Precedence(t *testing.T) {
+  infixTests := []struct{
+    input string
+    expected string
+  }{
+    {"-a * b", "((-a)*b)"},
+    {"a + b + c", "((a+b)+c)"},
+    {"a * b / c", "((a*b)/c)"},
+    {"1 + (2 + 3) + 4", "((1+(2+3))+4)"},
+  }
+
+  for _, subject := range infixTests {
+    l := lexer.New(subject.input)
+    parser := New(l)
+  
+    result := parser.Parse().String()
+    if result != subject.expected {
+      t.Fatalf("expected=%s, got=%s", subject.expected, result)
+    }
+  }
+}

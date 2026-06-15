@@ -19,11 +19,18 @@ const (
   _ int = iota
   LOWEST
   EQUALS
-  LTGT
   SUM
   PRODUCT
   PREFIX
 )
+
+var precedences = map[token.TokenType]int{
+  token.T_ASSIGN: EQUALS,
+  token.T_PLUS:   SUM,
+  token.T_MINUS:  SUM,
+  token.T_SLASH:  PRODUCT,
+  token.T_STAR:   PRODUCT,
+}
 
 type Parser struct {
   l *lexer.Lexer
@@ -32,7 +39,7 @@ type Parser struct {
   peek    token.Token
 
   prefixParseFunctions map[token.TokenType]PrefixParseFunction
-  infixParseFunction   map[token.TokenType]InfixParseFunction
+  infixParseFunctions  map[token.TokenType]InfixParseFunction
 }
 
 func (parser *Parser) registerPrefixFunction(tokenType token.TokenType, handle PrefixParseFunction) {
@@ -40,7 +47,7 @@ func (parser *Parser) registerPrefixFunction(tokenType token.TokenType, handle P
 }
 
 func (parser *Parser) registerInfixFunction(tokenType token.TokenType, handle InfixParseFunction) {
-  parser.infixParseFunction[tokenType] = handle
+  parser.infixParseFunctions[tokenType] = handle
 }
 
 func (parser *Parser) nextToken() {
@@ -65,6 +72,22 @@ func (parser *Parser) expectPeek(t token.TokenType) bool {
   return false
 }
 
+func (parser *Parser) peekPrecedence() int {
+  if p, ok := precedences[parser.peek.Type]; ok {
+    return p
+  }
+
+  return LOWEST
+}
+
+func (parser *Parser) currentPrecedence() int {
+  if p, ok := precedences[parser.current.Type]; ok {
+    return p
+  }
+
+  return LOWEST
+}
+
 func New(l *lexer.Lexer) *Parser {
   parser := &Parser{ l: l }
 
@@ -72,6 +95,14 @@ func New(l *lexer.Lexer) *Parser {
   parser.registerPrefixFunction(token.T_IDENTIFIER, parser.parseIdentifier)
   parser.registerPrefixFunction(token.T_INTEGER, parser.parseInteger)
   parser.registerPrefixFunction(token.T_MINUS, parser.parsePrefix)
+  parser.registerPrefixFunction(token.T_OPEN_PAREN, parser.parseGroupedExpression)
+
+  parser.infixParseFunctions = make(map[token.TokenType]InfixParseFunction)
+  parser.registerInfixFunction(token.T_PLUS, parser.parseInfix)
+  parser.registerInfixFunction(token.T_MINUS, parser.parseInfix)
+  parser.registerInfixFunction(token.T_SLASH, parser.parseInfix)
+  parser.registerInfixFunction(token.T_STAR, parser.parseInfix)
+
 
   // set current and peek
   parser.nextToken()
@@ -122,7 +153,21 @@ func (parser *Parser) parseExpression(precedence int) ast.Expression {
     return nil
   }
 
-  return prefix()
+  left := prefix()
+
+  for !parser.peekTokenIs(token.T_END) && precedence < parser.peekPrecedence() {
+    infix := parser.infixParseFunctions[parser.peek.Type]
+
+    if infix == nil {
+      return left
+    }
+
+    parser.nextToken()
+
+    left = infix(left)
+  }
+
+  return left
 }
 
 func (parser *Parser) parsePrefix() ast.Expression {
@@ -136,4 +181,32 @@ func (parser *Parser) parsePrefix() ast.Expression {
   prefix.Right = parser.parseExpression(PREFIX)
 
   return prefix
+}
+
+func (parser *Parser) parseInfix(left ast.Expression) ast.Expression {
+  infix := &ast.InfixExpression{
+    Token: parser.current,
+    Operator: parser.current.Literal,
+    Left: left,
+  }
+
+  p := parser.currentPrecedence()
+
+  parser.nextToken()
+
+  infix.Right = parser.parseExpression(p)
+
+  return infix
+}
+
+func (parser *Parser) parseGroupedExpression() ast.Expression {
+  parser.nextToken()
+
+  exp := parser.parseExpression(LOWEST)
+
+  if !parser.expectPeek(token.T_CLOSE_PAREN) {
+    return nil
+  }
+
+  return exp
 }
