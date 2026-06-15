@@ -27,3 +27,9 @@ type ExpressionStatement struct {
   Token token.Token
   Expression  Expression
 }
+
+type PrefixExpression struct {
+  Token token.Token
+  Operator string
+  Right Expression
+}

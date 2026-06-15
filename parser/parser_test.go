@@ -145,3 +145,27 @@ func Test__IntegerLiteralExpression(t *testing.T) {
     t.Fatalf("integer Literal not 10, got=%s", integer.Literal())
   }
 }
+
+func Test__NegPrefixExpression(t *testing.T) {
+  l := lexer.New(`-10`)
+  parser := New(l)
+
+  session := parser.Parse()
+  if len(session.Statements) != 1 {
+    t.Fatalf("Expected 1 IntegerLiteralExpression, got=%d", len(session.Statements))
+  }
+
+  statement, ok := session.Statements[0].(*ast.ExpressionStatement)
+  if !ok {
+    t.Fatalf("Statement not ExpressionStatement, got=%T", statement)
+  }
+
+  exp, ok := statement.Expression.(*ast.PrefixExpression)
+  if !ok {
+    t.Fatalf("Expression not PrefixExpression, got=%T", exp)
+  }
+
+  if exp.Operator != "-" {
+    t.Fatalf("Operator not neg, got=%s", exp.Operator)
+  }
+}
